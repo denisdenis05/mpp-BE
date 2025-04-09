@@ -1,20 +1,24 @@
 using Movies.Business.Models.Movies;
+using Movies.Business.Models.PagingAndFiltering;
+using Movies.Business.Services.Filtering;
 using Movies.Data;
+using Movies.Data.Models;
 
 namespace Movies.Business.Services.Movies;
 
 public class MovieService: IMovieService
 {
-    public List<MovieDTO> GetAllMovies()
+    private IFilterService<Movie, MovieResponse> _filterService;
+
+    public MovieService(IFilterService<Movie, MovieResponse> filterService)
     {
-        return DbContext.Movies.Select(movie => new MovieDTO
-        {
-            Title = movie.Title,
-            Director = movie.Director,
-            Genre = movie.Genre,
-            MPA = movie.MPA,
-            Writer = movie.Writer,
-            Rating = movie.Rating,
-        });
+        _filterService = filterService;
+    }
+    
+    public async Task<FilterResponse<MovieResponse>> GetAllMovies(FilterObjectDTO request)
+    {
+        var data = DbContext.Movies.AsQueryable();
+        
+        return await _filterService.Filter(request, data);
     }
 }

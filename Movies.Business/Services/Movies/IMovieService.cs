@@ -1,8 +1,9 @@
 using Movies.Business.Models.Movies;
+using Movies.Business.Models.PagingAndFiltering;
 
 namespace Movies.Business.Services.Movies;
 
 public interface IMovieService
 {
-    List<MovieDTO> GetAllMovies();
+    Task<FilterResponse<MovieResponse>> GetAllMovies(FilterObjectDTO request);
 }

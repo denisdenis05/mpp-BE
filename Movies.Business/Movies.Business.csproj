@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Movies.Data\Movies.Data.csproj" />
 </ItemGroup>
 
+<ItemGroup>
+  <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
+</ItemGroup>
+
 </Project>

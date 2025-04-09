@@ -1,7 +1,6 @@
-
 using Movies.Business.Models.Movies;
 
-namespace Movies.API.CONSTANTS;
+namespace Movies.Business.CONSTANTS;
 
 public static class FilteringConstants
 {

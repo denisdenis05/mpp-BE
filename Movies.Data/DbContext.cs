@@ -199,5 +199,5 @@ public class DbContext : Microsoft.EntityFrameworkCore.DbContext
         }
     };
 
-    public List<Movie> Movies { get; set; } = moviedata;
+    public static List<Movie> Movies { get; set; } = moviedata;
 }
