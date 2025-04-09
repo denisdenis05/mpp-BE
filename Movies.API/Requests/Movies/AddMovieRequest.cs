@@ -1,11 +1,11 @@
 using FluentValidation;
 using Movies.API.CONSTANTS;
+using Movies.Business.CONSTANTS;
 
 namespace Movies.API.Requests.Movies;
 
-public class EditMovieRequest
+public class AddMovieRequest
 {
-    public int Id { get; set; }
     public string Title { get; set; }
     public string Director { get; set; }
     public string Writer { get; set; }
@@ -13,10 +13,9 @@ public class EditMovieRequest
     public string MPA { get; set; }
     public double Rating { get; set; }
 }
-
-public class EditMovieRequestValidator : AbstractValidator<EditMovieRequest>
+public class AddMovieRequestValidator : AbstractValidator<AddMovieRequest>
 {
-    public EditMovieRequestValidator()
+    public AddMovieRequestValidator()
     {
         RuleFor(request => request.Title).NotEmpty().Must(title=> title.Length is > 0 and <= 50);
         RuleFor(request => request.Writer).NotEmpty().Must(title=> title.Length is > 0 and <= 50);

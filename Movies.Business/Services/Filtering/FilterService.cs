@@ -24,7 +24,7 @@ public class FilterService<TIn, TOut>: IFilterService<TIn, TOut>
             {
                 var field = filter.FieldToFilterBy;
                 var value = filter.Value;
-                var operation = FilteringConstants.MapAcronymsToOperations[filter.Operation];
+                var operation = filter.Operation;
                 var expression = String.Empty;
                 
                 switch (operation)

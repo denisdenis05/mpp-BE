@@ -30,4 +30,14 @@ public static class MoviesExtensions
         MPA = request.MPA,
         Rating = request.Rating,
     };
+
+    public static AddMovieDTO toAddMovieDTO(this AddMovieRequest request) => new AddMovieDTO
+    {
+        Title = request.Title,
+        Writer = request.Writer,
+        Director = request.Director,
+        Genre = request.Genre,
+        MPA = request.MPA,
+        Rating = request.Rating,
+    };
 }

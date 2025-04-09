@@ -8,4 +8,6 @@ public interface IMovieService
     Task<FilterResponse<MovieResponse>> GetAllMovies(FilterObjectDTO request);
     Task DeleteMovie(DeleteMovieDTO request);
     Task EditMovie(EditMovieDTO request);
+    Task AddMovie(AddMovieDTO request);
+    Task<StatsDTO> GetAverages();
 }

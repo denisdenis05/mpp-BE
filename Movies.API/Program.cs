@@ -1,3 +1,5 @@
+using Movies.API.Hubs;
+using Movies.API.Hubs.MovieStats;
 using Movies.Business;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,10 +9,33 @@ builder.Services.AddApplicationServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddHostedService<StatsBroadcaster>(); 
+builder.Services.AddSignalR();
+
+
+var allowedOrigins = new[] {
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002"
+};
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
@@ -23,6 +48,8 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseAuthorization();
+app.MapHub<MovieStatsHub>("/movieStatsHub");
 app.MapControllers();
+
 
 app.Run();

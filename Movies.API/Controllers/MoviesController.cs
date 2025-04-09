@@ -23,7 +23,7 @@ public class MoviesController : ControllerBase
         return Ok(message);
     }
     
-    [HttpPost("delete")]
+    [HttpDelete("delete")]
     public async Task<IActionResult> DeleteMovie([FromBody] DeleteMovieRequest request)
     {
         await _service.DeleteMovie(request.toDeleteMovieDTO());
@@ -31,11 +31,27 @@ public class MoviesController : ControllerBase
         return Ok();
     }
     
-    [HttpPost("edit")]
+    [HttpPatch("edit")]
     public async Task<IActionResult> EditMovie([FromBody] EditMovieRequest request)
     {
         await _service.EditMovie(request.toEditMovieDTO());
         
         return Ok();
+    }
+    
+    [HttpPost("add")]
+    public async Task<IActionResult> AddMovie([FromBody] AddMovieRequest request)
+    {
+        await _service.AddMovie(request.toAddMovieDTO());
+        
+        return Ok();
+    }
+    
+    [HttpGet("get-averages")]
+    public async Task<IActionResult> GetAverages()
+    {
+        var averages = await _service.GetAverages();
+        
+        return Ok(averages);
     }
 }

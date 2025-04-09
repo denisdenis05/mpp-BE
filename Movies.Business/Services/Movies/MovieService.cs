@@ -39,4 +39,37 @@ public class MovieService: IMovieService
         movieToEdit.MPA = request.MPA;
         movieToEdit.Rating = request.Rating;
     }
+
+    public async Task AddMovie(AddMovieDTO request)
+    {
+        DbContext.Movies.Add(new Movie
+        {
+            Writer = request.Writer,
+            Director = request.Director,
+            Genre = request.Genre,
+            MPA = request.MPA,
+            Rating = request.Rating,
+            Title = request.Title
+        });
+    }
+
+    public async Task<StatsDTO> GetAverages()
+    {
+        var ratings = DbContext.Movies
+            .Where(m => m.Rating != null)
+            .Select(m => m.Rating)
+            .ToList();
+
+        if (ratings == null || ratings.Count == 0)
+            return null;
+
+        var stats = new StatsDTO
+        {
+            Max = ratings.Max(),
+            Min = ratings.Min(),
+            Average = ratings.Average()
+        };
+
+        return stats;
+    }
 }
