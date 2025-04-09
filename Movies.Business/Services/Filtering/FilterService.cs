@@ -25,8 +25,23 @@ public class FilterService<TIn, TOut>: IFilterService<TIn, TOut>
                 var field = filter.FieldToFilterBy;
                 var value = filter.Value;
                 var operation = FilteringConstants.MapAcronymsToOperations[filter.Operation];
+                var expression = String.Empty;
+                
+                switch (operation)
+                {
+                    case "in":
+                        expression = $"{field}.Contains(@0)";
+                        break;
+                    case "notin":
+                        expression = $"!{field}.Contains(@0)";
+                        break;
+                    default:
+                        var mappedOp = FilteringConstants.MapAcronymsToOperations[operation];
+                        expression = $"{field} {mappedOp} @0";
+                        break;
+                }
 
-                result = result.Where($"{field} {operation} @0", value);
+                result = result.Where(expression, value);
             }
         }
 

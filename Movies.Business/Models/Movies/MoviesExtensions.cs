@@ -6,6 +6,7 @@ public static class MoviesExtensions
 {
     public static MovieResponse toMovieResponse(this Movie movie) => new MovieResponse
     {
+        Id = movie.Id,
         Title = movie.Title,
         Writer = movie.Writer,
         Director = movie.Director,

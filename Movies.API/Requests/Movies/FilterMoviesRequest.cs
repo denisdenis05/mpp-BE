@@ -4,7 +4,7 @@ using Movies.API.Requests.PagingAndFiltering;
 
 namespace Movies.API.Requests.Movies;
 
-public class GetAllMoviesFilteredRequest
+public class FilterMoviesRequest
 {
     public bool OnlyCount { get; set; } = false;
     public PagingRequest Paging { get; set; } = new PagingRequest();
@@ -13,7 +13,7 @@ public class GetAllMoviesFilteredRequest
     
 }
 
-public class FilterProblemsRequestValidator<T> : AbstractValidator<GetAllMoviesFilteredRequest>
+public class FilterProblemsRequestValidator<T> : AbstractValidator<FilterMoviesRequest>
 {
     public FilterProblemsRequestValidator()
     {

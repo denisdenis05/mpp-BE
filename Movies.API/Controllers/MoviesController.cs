@@ -15,11 +15,27 @@ public class MoviesController : ControllerBase
         _service = exampleService;
     }
     
-    [HttpPost("getAll")]
-    public IActionResult GetMessage([FromBody] GetAllMoviesFilteredRequest request)
+    [HttpPost("filter")]
+    public async Task<IActionResult> GetFilteredMovies([FromBody] FilterMoviesRequest request)
     {
-        var message = _service.GetAllMovies(request.toFilterMoviesDTO());
+        var message = await _service.GetAllMovies(request.toFilterMoviesDTO());
         
         return Ok(message);
+    }
+    
+    [HttpPost("delete")]
+    public async Task<IActionResult> DeleteMovie([FromBody] DeleteMovieRequest request)
+    {
+        await _service.DeleteMovie(request.toDeleteMovieDTO());
+        
+        return Ok();
+    }
+    
+    [HttpPost("edit")]
+    public async Task<IActionResult> EditMovie([FromBody] EditMovieRequest request)
+    {
+        await _service.EditMovie(request.toEditMovieDTO());
+        
+        return Ok();
     }
 }

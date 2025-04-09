@@ -1,6 +1,6 @@
 namespace Movies.Business.Models.Movies;
 
-public class MovieResponse
+public class EditMovieDTO
 {
     public int Id { get; set; }
     public string Title { get; set; }

@@ -12,6 +12,8 @@ public static class FilteringConstants
         {"ge", ">="},
         {"le", "<="},
         {"ne", "!="},
+        {"in", "in"},
+        {"notin", "notin"}
     };
     
     public static readonly List<string> ValidSortingOrder = new List<string>

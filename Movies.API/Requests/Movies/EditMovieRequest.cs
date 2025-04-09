@@ -1,6 +1,6 @@
-namespace Movies.Business.Models.Movies;
+namespace Movies.API.Requests.Movies;
 
-public class MovieResponse
+public class EditMovieRequest
 {
     public int Id { get; set; }
     public string Title { get; set; }
