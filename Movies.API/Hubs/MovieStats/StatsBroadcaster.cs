@@ -7,16 +7,17 @@ namespace Movies.API.Hubs.MovieStats;
 public class StatsBroadcaster : BackgroundService
 {
     private readonly IHubContext<MovieStatsHub> _hubContext;
-    private readonly DbContext DbContext;
+    private readonly DbContext _dbContext;
 
-    public StatsBroadcaster(IHubContext<MovieStatsHub> hubContext)
+    public StatsBroadcaster(IHubContext<MovieStatsHub> hubContext, DbContext dbContext)
     {
         _hubContext = hubContext;
+        _dbContext = dbContext;
     }
 
     public async Task BroadcastAll()
     {
-        var data = DbContext.Movies.ToList();
+        var data = _dbContext.Movies.ToList();
         
         var histogram = Enumerable.Range(0, 10).Select(i => new HistogramBin
         {

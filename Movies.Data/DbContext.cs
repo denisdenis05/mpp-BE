@@ -19,8 +19,8 @@ public class DbContext : Microsoft.EntityFrameworkCore.DbContext
         modelBuilder.ApplyConfiguration(new TestConfiguration());
         base.OnModelCreating(modelBuilder);
     }*/
-
-    public static List<Movie> moviedata = new List<Movie>
+    
+    public List<Movie> Movies { get; set; } = new List<Movie>
     {
         new Movie
         {
@@ -198,6 +198,4 @@ public class DbContext : Microsoft.EntityFrameworkCore.DbContext
             Genre = "Comedy", Rating = 8.1
         }
     };
-
-    public static List<Movie> Movies { get; set; } = moviedata;
 }

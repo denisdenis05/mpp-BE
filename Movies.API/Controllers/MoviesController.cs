@@ -18,7 +18,15 @@ public class MoviesController : ControllerBase
     [HttpPost("filter")]
     public async Task<IActionResult> GetFilteredMovies([FromBody] FilterMoviesRequest request)
     {
-        var message = await _service.GetAllMovies(request.toFilterMoviesDTO());
+        var message = await _service.GetAllFilteredMovies(request.toFilterMoviesDTO());
+        
+        return Ok(message);
+    }
+    
+    [HttpGet("get-all")]
+    public async Task<IActionResult> GetAllMovies()
+    {
+        var message = await _service.GetAllMovies();
         
         return Ok(message);
     }

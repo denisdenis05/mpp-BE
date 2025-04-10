@@ -5,7 +5,8 @@ namespace Movies.Business.Services.Movies;
 
 public interface IMovieService
 {
-    Task<FilterResponse<MovieResponse>> GetAllMovies(FilterObjectDTO request);
+    Task<FilterResponse<MovieResponse>> GetAllFilteredMovies(FilterObjectDTO request);
+    Task<List<MovieResponse>> GetAllMovies();
     Task DeleteMovie(DeleteMovieDTO request);
     Task EditMovie(EditMovieDTO request);
     Task AddMovie(AddMovieDTO request);

@@ -9,27 +9,36 @@ namespace Movies.Business.Services.Movies;
 public class MovieService: IMovieService
 {
     private IFilterService<Movie, MovieResponse> _filterService;
+    private DbContext _dbContext;
 
-    public MovieService(IFilterService<Movie, MovieResponse> filterService)
+    public MovieService(IFilterService<Movie, MovieResponse> filterService, DbContext dbContext)
     {
         _filterService = filterService;
+        _dbContext = dbContext;
     }
     
-    public async Task<FilterResponse<MovieResponse>> GetAllMovies(FilterObjectDTO request)
+    public async Task<FilterResponse<MovieResponse>> GetAllFilteredMovies(FilterObjectDTO request)
     {
-        var data = DbContext.Movies.AsQueryable();
+        var data = _dbContext.Movies.AsQueryable();
         
         return await _filterService.Filter(request, data);
     }
 
+    public async Task<List<MovieResponse>> GetAllMovies()
+    {
+        var data = _dbContext.Movies.Select(movie => movie.toMovieResponse()).ToList();
+
+        return data;
+    }
+
     public async Task DeleteMovie(DeleteMovieDTO request)
     {
-        DbContext.Movies = DbContext.Movies.Where(m => m.Id != request.Id).ToList();
+        _dbContext.Movies = _dbContext.Movies.Where(m => m.Id != request.Id).ToList();
     }
 
     public async Task EditMovie(EditMovieDTO request)
     {
-        var movieToEdit = DbContext.Movies.FirstOrDefault(m => m.Id == request.Id);
+        var movieToEdit = _dbContext.Movies.FirstOrDefault(m => m.Id == request.Id);
         
         movieToEdit.Id = request.Id;
         movieToEdit.Title = request.Title;
@@ -42,7 +51,7 @@ public class MovieService: IMovieService
 
     public async Task AddMovie(AddMovieDTO request)
     {
-        DbContext.Movies.Add(new Movie
+        _dbContext.Movies.Add(new Movie
         {
             Writer = request.Writer,
             Director = request.Director,
@@ -55,7 +64,7 @@ public class MovieService: IMovieService
 
     public async Task<StatsDTO> GetAverages()
     {
-        var ratings = DbContext.Movies
+        var ratings = _dbContext.Movies
             .Where(m => m.Rating != null)
             .Select(m => m.Rating)
             .ToList();

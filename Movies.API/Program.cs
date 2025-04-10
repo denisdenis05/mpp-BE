@@ -1,6 +1,7 @@
 using Movies.API.Hubs;
 using Movies.API.Hubs.MovieStats;
 using Movies.Business;
+using Movies.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddHostedService<StatsBroadcaster>(); 
 builder.Services.AddSignalR();
 
+builder.Services.AddSingleton(new DbContext());
 
 var allowedOrigins = new[] {
     "http://localhost:3000",
