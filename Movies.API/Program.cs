@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using Movies.API.Hubs;
 using Movies.API.Hubs.MovieStats;
 using Movies.Business;
@@ -32,6 +33,10 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = long.MaxValue; 
+});
 
 
 var app = builder.Build();
