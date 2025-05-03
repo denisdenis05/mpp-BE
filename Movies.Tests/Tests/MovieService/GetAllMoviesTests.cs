@@ -1,5 +1,7 @@
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Moq;
+using Moq.EntityFrameworkCore;
 using Movies.Business.Models.Movies;
 using Movies.Business.Models.PagingAndFiltering;
 using Movies.Business.Services.Filtering;
@@ -11,7 +13,7 @@ namespace TestProject1.Tests.MovieService;
 
 public class GetAllMoviesTests
     {
-        private Mock<DbContext> _mockDbContext;
+        private Mock<MovieDbContext> _mockDbContext;
         private Movies.Business.Services.Movies.MovieService _movieService;
         private FilterService<Movie, MovieResponse> _filterService;
 
@@ -24,9 +26,8 @@ public class GetAllMoviesTests
             _movieService = new Movies.Business.Services.Movies.MovieService(_filterService, _mockDbContext.Object);
         }
 
-        private Mock<DbContext> SetupDbContext()
+        private Mock<MovieDbContext> SetupDbContext()
         {
-            var dbContext = new Mock<DbContext>();
             var allMovies = new List<Movie>
             {
                 new Movie
@@ -46,10 +47,10 @@ public class GetAllMoviesTests
                 }
             };
             
-            dbContext.Object.Movies = allMovies;
-
+            var mockDbContext = new Mock<MovieDbContext>(new DbContextOptions<MovieDbContext>());
+            mockDbContext.Setup(c => c.Movies).ReturnsDbSet(allMovies);
             
-            return dbContext;
+            return mockDbContext;
         }
         
         

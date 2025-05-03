@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Movies.API.Requests.Movies;
 using Movies.Business.Services.Movies;
@@ -6,6 +7,7 @@ namespace Movies.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class MoviesController : ControllerBase
 {
     public IMovieService _service;
@@ -31,6 +33,7 @@ public class MoviesController : ControllerBase
         return Ok(message);
     }
     
+    [Authorize(Roles = "admin")]
     [HttpDelete("delete")]
     public async Task<IActionResult> DeleteMovie([FromBody] DeleteMovieRequest request)
     {
@@ -39,6 +42,7 @@ public class MoviesController : ControllerBase
         return Ok();
     }
     
+    [Authorize(Roles = "admin")]
     [HttpPatch("edit")]
     public async Task<IActionResult> EditMovie([FromBody] EditMovieRequest request)
     {
@@ -47,6 +51,7 @@ public class MoviesController : ControllerBase
         return Ok();
     }
     
+    [Authorize(Roles = "admin")]
     [HttpPost("add")]
     public async Task<IActionResult> AddMovie([FromBody] AddMovieRequest request)
     {

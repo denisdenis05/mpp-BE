@@ -1,5 +1,8 @@
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Moq;
+using Moq.EntityFrameworkCore;
 using Movies.Business.Models.Movies;
 using Movies.Business.Models.PagingAndFiltering;
 using Movies.Business.Services.Filtering;
@@ -11,7 +14,7 @@ namespace TestProject1.Tests.MovieService;
 
 public class GetAllFilteredMoviesTests
     {
-        private Mock<DbContext> _mockDbContext;
+        private Mock<MovieDbContext> _mockDbContext;
         private Movies.Business.Services.Movies.MovieService _movieService;
         private FilterService<Movie, MovieResponse> _filterService;
 
@@ -23,10 +26,9 @@ public class GetAllFilteredMoviesTests
             _filterService = new FilterService<Movie, MovieResponse>(p => p.toMovieResponse());
             _movieService = new Movies.Business.Services.Movies.MovieService(_filterService, _mockDbContext.Object);
         }
-
-        private Mock<DbContext> SetupDbContext()
+        
+        private Mock<MovieDbContext> SetupDbContext()
         {
-            var dbContext = new Mock<DbContext>();
             var allMovies = new List<Movie>
             {
                 new Movie
@@ -46,10 +48,17 @@ public class GetAllFilteredMoviesTests
                 }
             };
             
-            dbContext.Object.Movies = allMovies;
-
-            
-            return dbContext;
+            var mockDbContext = new Mock<MovieDbContext>(new DbContextOptions<MovieDbContext>());
+    
+            mockDbContext.Setup(c => c.Movies).ReturnsDbSet(allMovies.AsQueryable());
+    
+            mockDbContext.Setup(c => c.Movies.FindAsync(It.IsAny<object[]>()))
+                .ReturnsAsync((object[] ids) => allMovies.FirstOrDefault(m => m.Id == (int)ids[0]));
+    
+            mockDbContext.Setup(c => c.SaveChanges()).Returns(1);
+            mockDbContext.Setup(c => c.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+    
+            return mockDbContext;
         }
 
         private FilteringDTO constructFilterRequest(string field, string value, string operation) =>

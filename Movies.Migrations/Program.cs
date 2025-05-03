@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using DbContext = Movies.Data.DbContext;
 
 namespace Movies.Migrations;
 
@@ -22,7 +21,7 @@ public class Program
             })
             .ConfigureServices((context, services) =>
             {
-                services.AddDbContext<DbContext>(options =>
+                services.AddDbContext<MovieDbContext>(options =>
                     options.UseNpgsql(context.Configuration.GetConnectionString("DefaultConnection"),
                         b => b.MigrationsAssembly("Movies.Migrations")));
             })

@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Movies.Business.Models.Movies;
 using Movies.Business.Models.PagingAndFiltering;
 using Movies.Business.Services.Filtering;
@@ -9,49 +10,56 @@ namespace Movies.Business.Services.Movies;
 public class MovieService: IMovieService
 {
     private IFilterService<Movie, MovieResponse> _filterService;
-    private DbContext _dbContext;
+    private MovieDbContext _movieDbContext;
 
-    public MovieService(IFilterService<Movie, MovieResponse> filterService, DbContext dbContext)
+    public MovieService(IFilterService<Movie, MovieResponse> filterService, MovieDbContext movieDbContext)
     {
         _filterService = filterService;
-        _dbContext = dbContext;
+        _movieDbContext = movieDbContext;
     }
     
     public async Task<FilterResponse<MovieResponse>> GetAllFilteredMovies(FilterObjectDTO request)
     {
-        var data = _dbContext.Movies.AsQueryable();
-        
+        var data = _movieDbContext.Movies.AsQueryable();
         return await _filterService.Filter(request, data);
     }
 
     public async Task<List<MovieResponse>> GetAllMovies()
     {
-        var data = _dbContext.Movies.Select(movie => movie.toMovieResponse()).ToList();
-
-        return data;
+        return await _movieDbContext.Movies
+            .Select(movie => movie.toMovieResponse())
+            .ToListAsync();
     }
 
     public async Task DeleteMovie(DeleteMovieDTO request)
     {
-        _dbContext.Movies = _dbContext.Movies.Where(m => m.Id != request.Id).ToList();
+        var movie = await _movieDbContext.Movies.FindAsync(request.Id);
+        if (movie is not null)
+        {
+            _movieDbContext.Movies.Remove(movie);
+            await _movieDbContext.SaveChangesAsync();
+        }
     }
 
     public async Task EditMovie(EditMovieDTO request)
     {
-        var movieToEdit = _dbContext.Movies.FirstOrDefault(m => m.Id == request.Id);
-        
-        movieToEdit.Id = request.Id;
-        movieToEdit.Title = request.Title;
-        movieToEdit.Writer = request.Writer;
-        movieToEdit.Director = request.Director;
-        movieToEdit.Genre = request.Genre;
-        movieToEdit.MPA = request.MPA;
-        movieToEdit.Rating = request.Rating;
+        var movieToEdit = await _movieDbContext.Movies.FirstOrDefaultAsync(m => m.Id == request.Id);
+        if (movieToEdit is not null)
+        {
+            movieToEdit.Title = request.Title;
+            movieToEdit.Writer = request.Writer;
+            movieToEdit.Director = request.Director;
+            movieToEdit.Genre = request.Genre;
+            movieToEdit.MPA = request.MPA;
+            movieToEdit.Rating = request.Rating;
+
+            await _movieDbContext.SaveChangesAsync();
+        }
     }
 
     public async Task AddMovie(AddMovieDTO request)
     {
-        _dbContext.Movies.Add(new Movie
+        var newMovie = new Movie
         {
             Writer = request.Writer,
             Director = request.Director,
@@ -59,26 +67,24 @@ public class MovieService: IMovieService
             MPA = request.MPA,
             Rating = request.Rating,
             Title = request.Title
-        });
+        };
+
+        _movieDbContext.Movies.Add(newMovie);
+        await _movieDbContext.SaveChangesAsync();
     }
 
-    public async Task<StatsDTO> GetAverages()
+    public async Task<StatsDTO?> GetAverages()
     {
-        var ratings = _dbContext.Movies
-            .Where(m => m.Rating != null)
+        var ratings = await _movieDbContext.Movies
             .Select(m => m.Rating)
-            .ToList();
+            .ToListAsync();
 
-        if (ratings == null || ratings.Count == 0)
-            return null;
-
-        var stats = new StatsDTO
+        return new StatsDTO
         {
             Max = ratings.Max(),
             Min = ratings.Min(),
             Average = ratings.Average()
         };
-
-        return stats;
     }
+
 }
