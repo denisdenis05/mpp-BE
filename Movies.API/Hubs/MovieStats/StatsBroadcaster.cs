@@ -4,7 +4,7 @@ using Movies.Data;
 
 namespace Movies.API.Hubs.MovieStats;
 
-public class StatsBroadcaster : BackgroundService
+public class StatsBroadcaster : Microsoft.Extensions.Hosting.BackgroundService
 {
     private readonly IHubContext<MovieStatsHub> _hubContext;
     private readonly MovieDbContext _movieDbContext;

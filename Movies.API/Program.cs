@@ -4,11 +4,15 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Movies.Data;
 using Microsoft.EntityFrameworkCore;
+using Movies.API.Hubs.MovieStats;
+using Movies.BackgroundService;
 using Movies.Business;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// Add services to the containerbuilder.Services.AddSignalR();
+builder.Services.AddSignalR();
+builder.Services.AddHostedService<SuspiciousUserChecker>();
 builder.Services.AddApplicationServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -44,7 +48,6 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<MovieDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 var allowedOrigins = new[] {
     "http://localhost:3000",
     "http://localhost:3001",
@@ -81,12 +84,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+
 var app = builder.Build();
 
 app.UseCors("AllowFrontend");
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.MapHub<MovieStatsHub>("/movieStatsHub");
 
 app.UseAuthentication();  // Add authentication middleware
 app.UseAuthorization();

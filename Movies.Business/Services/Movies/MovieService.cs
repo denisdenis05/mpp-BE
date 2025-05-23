@@ -31,6 +31,16 @@ public class MovieService: IMovieService
             .ToListAsync();
     }
 
+    public async Task<List<Endorsement>> GetEndorsements(int movieId)
+    {
+        var movie = _movieDbContext.Movies
+            .Include(movie => movie.Endorsements)
+            .Where(movie => movie.Id == movieId)
+            .FirstOrDefault();
+
+        return movie.Endorsements.Take(10).ToList();
+    }
+
     public async Task DeleteMovie(DeleteMovieDTO request)
     {
         var movie = await _movieDbContext.Movies.FindAsync(request.Id);
@@ -38,6 +48,8 @@ public class MovieService: IMovieService
         {
             _movieDbContext.Movies.Remove(movie);
             await _movieDbContext.SaveChangesAsync();
+            
+            
         }
     }
 
@@ -86,5 +98,4 @@ public class MovieService: IMovieService
             Average = ratings.Average()
         };
     }
-
 }

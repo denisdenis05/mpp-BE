@@ -9,6 +9,7 @@ using Movies.API.Requests.Auth;
 using Movies.Business.Models.Auth;
 using Movies.Data;
 using Movies.Data.Models;
+using OtpNet;
 
 namespace Movies.Business.Services.Authentication;
 
@@ -62,6 +63,51 @@ public class AuthService : IAuthService
         {
             Username = user.Username
         };
+    }
+
+    public async Task<bool> Is2FAEnabled(string username)
+    {
+        return _movieDbContext.Users.FirstOrDefault(u => u.Username == username).TwoFactorEnabled;
+    }
+
+    public async Task Enable2FA(string username)
+    {
+        var bytes = RandomNumberGenerator.GetBytes(20);
+        var userSecretKey = Base32Encoding.ToString(bytes);
+        
+        var user = _movieDbContext.Users.FirstOrDefault(u => u.Username == username);
+        user.TwoFactorSecret = userSecretKey;
+        
+        await _movieDbContext.SaveChangesAsync();
+    }
+
+    public async Task<string> Get2FAQrCode(string username)
+    {
+        var user = await _movieDbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+
+        string issuer = "MoviesApp";
+        return $"otpauth://totp/{issuer}:{user.Username}?secret={user.TwoFactorSecret}&issuer={issuer}&digits=6";
+    }
+
+    public async Task<bool> ConfirmLink(string username, string code)
+    {
+        if (!ValidateCode(username, code))
+            return false;
+        
+        var user = await _movieDbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+        user.TwoFactorEnabled = true;
+        
+        await _movieDbContext.SaveChangesAsync();
+
+        return true;
+    }
+    
+    public bool ValidateCode(string username, string code)
+    {
+        var user = _movieDbContext.Users.FirstOrDefault(u => u.Username == username);
+
+        var totp = new Totp(Base32Encoding.ToBytes(user.TwoFactorSecret));
+        return totp.VerifyTotp(code, out long _, new VerificationWindow(2, 2));
     }
     
     public string GenerateJwtToken(string username)

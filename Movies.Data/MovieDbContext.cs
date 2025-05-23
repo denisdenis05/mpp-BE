@@ -13,6 +13,9 @@ public class MovieDbContext : Microsoft.EntityFrameworkCore.DbContext
     }
 
     public virtual DbSet<Movie> Movies { get; set; }
+    public virtual DbSet<Endorsement> Endorsements { get; set; }
+    public virtual DbSet<EventCache> EventCaches { get; set; }
+    public virtual DbSet<MonitoredUser> MonitoredUsers { get; set; }
     public DbSet<User> Users { get; set; } 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

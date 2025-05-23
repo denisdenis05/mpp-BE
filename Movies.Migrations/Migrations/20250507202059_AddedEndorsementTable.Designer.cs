@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Movies.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Movies.Migrations.Migrations
 {
     [DbContext(typeof(MovieDbContext))]
-    partial class MovieDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250507202059_AddedEndorsementTable")]
+    partial class AddedEndorsementTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,50 +48,6 @@ namespace Movies.Migrations.Migrations
                     b.HasIndex("MovieId");
 
                     b.ToTable("Endorsements");
-                });
-
-            modelBuilder.Entity("Movies.Data.Models.EventCache", b =>
-                {
-                    b.Property<int>("EventCacheId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("EventCacheId"));
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("EventCacheId");
-
-                    b.ToTable("EventCaches");
-                });
-
-            modelBuilder.Entity("Movies.Data.Models.MonitoredUser", b =>
-                {
-                    b.Property<int>("MonitoredUserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MonitoredUserId"));
-
-                    b.Property<bool>("Critical")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("MonitoredUserId");
-
-                    b.ToTable("MonitoredUsers");
                 });
 
             modelBuilder.Entity("Movies.Data.Models.Movie", b =>
@@ -158,12 +117,6 @@ namespace Movies.Migrations.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("TwoFactorSecret")
                         .HasColumnType("text");
 
                     b.Property<string>("Username")

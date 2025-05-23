@@ -9,4 +9,5 @@ public class Movie
     public string Genre { get; set; }
     public string MPA { get; set; }
     public double Rating { get; set; }
+    public List<Endorsement> Endorsements { get; set; }
 }
