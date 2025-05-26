@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run deployment script on remote server
+      - name: Pull latest changes from Git
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.REMOTE_HOST }}
@@ -17,4 +17,46 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            nohup /root/mpp/clone_build_and_start.sh &
+            set -e
+            echo "Pulling latest changes from Git..."
+            cd /root/mpp/mpp-BE
+            git pull
+
+      - name: Kill process using port 5001
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+            echo "Killing any process using port 5001..."
+            kill $(lsof -t -i:5001) 2>/dev/null || echo "No process running on port 5001"
+
+      - name: Apply database migrations
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+            echo "Applying database migrations..."
+            cd /root/mpp/mpp-BE/Movies.Migrations
+            dotnet ef database update
+
+      - name: Build and run API project
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+            echo "Building and running API project..."
+            cd /root/mpp/mpp-BE/Movies.API
+            dotnet build
+            dotnet run > /root/mpp/mpp-BE/Movies.API/app.log 2>&1 & disown
