@@ -34,6 +34,17 @@ jobs:
             echo "Killing any process using port 5001..."
             kill $(lsof -t -i:5001) 2>/dev/null || echo "No process running on port 5001"
 
+      - name: Install dotnet-ef tool
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            dotnet tool install --global dotnet-ef || echo "dotnet-ef already installed"
+            export PATH="$PATH:$HOME/.dotnet/tools"
+
       - name: Apply database migrations
         uses: appleboy/ssh-action@v1.0.0
         with:
