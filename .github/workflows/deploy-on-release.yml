@@ -1,0 +1,74 @@
+name: Deploy on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull latest changes from Git
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+            echo "Pulling latest changes from Git..."
+            cd /root/mpp/mpp-BE
+            git pull
+
+      - name: Kill process using port 5001
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+            echo "Killing any process using port 5001..."
+            kill $(lsof -t -i:5001) 2>/dev/null || echo "No process running on port 5001"
+
+      - name: Install dotnet-ef tool
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            dotnet tool install --global dotnet-ef || echo "dotnet-ef already installed"
+            export PATH="$PATH:$HOME/.dotnet/tools"
+
+      - name: Apply database migrations
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+            echo "Applying database migrations..."
+            cd /root/mpp/mpp-BE/Movies.Migrations
+            export PATH="$PATH:$HOME/.dotnet/tools"
+            dotnet ef database update
+
+      - name: Build and run API project
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+            echo "Building and running API project..."
+            cd /root/mpp/mpp-BE/Movies.API
+            dotnet build
+            dotnet run > /root/mpp/mpp-BE/Movies.API/app.log 2>&1 & disown
