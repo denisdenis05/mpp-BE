@@ -42,7 +42,7 @@ public class SuspiciousUserChecker : Microsoft.Extensions.Hosting.BackgroundServ
                     Count = g.Count(),
                     Actions = g.Select(item => item.Event.Action).Distinct().Count()
                 })
-                .Where(x => x.Count > 20 || x.Actions < 2)
+                .Where(x => x.Count > 400 && x.Actions < 2)
                 .ToList();
 
             
