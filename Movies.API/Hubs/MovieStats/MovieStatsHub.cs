@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Movies.Business.Models.Movies.Stats;
 
 namespace Movies.API.Hubs.MovieStats;
 
+[AllowAnonymous]
 public class MovieStatsHub : Hub
 {
     public async Task SendHistogramData(List<HistogramBin> data) =>

@@ -44,6 +44,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddHostedService<StatsBroadcaster>();
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<MovieDbContext>(options =>
@@ -88,10 +89,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
+app.UseRouting();
 app.UseCors("AllowFrontend");
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseRouting();
 app.MapHub<MovieStatsHub>("/movieStatsHub");
 
 app.UseAuthentication();  // Add authentication middleware
@@ -102,7 +103,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    c.RoutePrefix = string.Empty; // This makes Swagger UI available at the root URL
+    c.RoutePrefix = string.Empty; 
 });
 
 app.MapControllers();
