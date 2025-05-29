@@ -48,8 +48,6 @@ public class MovieService: IMovieService
         {
             _movieDbContext.Movies.Remove(movie);
             await _movieDbContext.SaveChangesAsync();
-            
-            
         }
     }
 
